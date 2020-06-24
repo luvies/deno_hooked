@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: denolib/setup-deno@master
+        with:
+          deno-version: 1.1.1
+      - name: Install Velociraptor
+        run: |
+          deno install -qA -n vr https://deno.land/x/velociraptor@v1.0.0-beta.11/cli.ts
+          echo "::add-path::$HOME/.deno/bin"
+      - name: Build
+        run: vr build
+      - name: Test
+        run: vr test

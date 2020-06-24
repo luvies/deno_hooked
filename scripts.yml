@@ -1,0 +1,3 @@
+scripts:
+  build: deno cache --reload ./mod.ts
+  test: deno test
