@@ -1,3 +1,7 @@
 scripts:
   build: deno cache --reload ./mod.ts
   test: deno test
+  quiet-test:
+    cmd: deno test --allow-env
+    env:
+      QUIET: 1

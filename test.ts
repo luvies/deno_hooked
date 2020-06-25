@@ -7,8 +7,17 @@ import {
   test,
 } from "./mod.ts";
 
+let quiet = false;
+try {
+  quiet = Deno.env.get("QUIET") === "1";
+} catch {}
+
 const encoder = new TextEncoder();
 function log(...strs: string[]): void {
+  if (quiet) {
+    return;
+  }
+
   const msg = " '" + strs.join(" ") + "' ";
   Deno.stdout.writeSync(encoder.encode(msg));
 }

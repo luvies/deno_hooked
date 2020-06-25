@@ -25,6 +25,19 @@
         "kind": "test",
         "isDefault": true
       }
+    },
+    {
+      "label": "Quiet Test",
+      "type": "shell",
+      "command": "vr quiet-test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
     }
   ]
 }

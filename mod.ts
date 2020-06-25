@@ -6,11 +6,13 @@ interface Hooks {
 
   waitingTests: number;
   completedTests: number;
+
+  onlyTests: number;
+  completedOnlyTests: number;
 }
 
 interface StackItem extends Hooks {
   name: string;
-  first: boolean;
 }
 
 interface GlobalContext extends Hooks {
@@ -21,18 +23,12 @@ const globalContext: GlobalContext = {
   stack: [],
   waitingTests: 0,
   completedTests: 0,
+  onlyTests: 0,
+  completedOnlyTests: 0,
 };
 
 function badArgs(): never {
   throw new Error("Invalid test definition");
-}
-
-function tab(i: number): string {
-  return " ".repeat(i * 4);
-}
-
-function clearTestName(name: string): string {
-  return "\u0008".repeat(name.length + 10);
 }
 
 export function test(t: Deno.TestDefinition): void;
@@ -52,22 +48,21 @@ export function test(
     globalContext.stack.map((name) => name.waitingTests++);
   }
 
-  // Generate name.
-  let name = [];
-  for (const [item, i] of globalContext.stack.map((n, i) => [n, i] as const)) {
-    if (item.first) {
-      name.push(tab(i) + item.name);
-      item.first = false;
-    }
+  if (opts.only) {
+    globalContext.onlyTests++;
+    globalContext.stack.map((name) => name.onlyTests++);
   }
-  name.push(tab(globalContext.stack.length) + testName);
+
+  // Generate name.
+  let name = globalContext.stack.map(({ name: n }) => n);
+  name.push(testName);
 
   // Build hook stack.
   const hooks: Hooks[] = [globalContext, ...globalContext.stack];
   const revHooks: Hooks[] = [...hooks].reverse();
 
   Deno.test({
-    name: clearTestName(name[0]) + name.join("\n"),
+    name: name.join(" > "),
     async fn() {
       // Before.
       for (const { beforeAll, beforeEach, completedTests } of hooks) {
@@ -82,15 +77,29 @@ export function test(
       await fn();
       for (const hook of hooks) {
         hook.completedTests++;
+
+        if (opts.only) {
+          hook.completedOnlyTests++;
+        }
       }
 
       // After.
       for (
-        const { afterAll, afterEach, waitingTests, completedTests } of revHooks
+        const {
+          afterAll,
+          afterEach,
+          waitingTests,
+          completedTests,
+          onlyTests,
+          completedOnlyTests,
+        } of revHooks
       ) {
         await afterEach?.();
 
-        if (waitingTests === completedTests) {
+        if (
+          waitingTests === completedTests ||
+          (onlyTests > 0 && onlyTests === completedOnlyTests)
+        ) {
           afterAll?.();
         }
       }
@@ -102,9 +111,10 @@ export function test(
 export function group(name: string, fn: () => void): void {
   globalContext.stack.push({
     name,
-    first: true,
     waitingTests: 0,
     completedTests: 0,
+    onlyTests: 0,
+    completedOnlyTests: 0,
   });
   fn();
   globalContext.stack.pop();
