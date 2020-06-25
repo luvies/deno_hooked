@@ -23,6 +23,10 @@ const globalContext: GlobalContext = {
   completedTests: 0,
 };
 
+function badArgs(): never {
+  throw new Error("Invalid test definition");
+}
+
 function tab(i: number): string {
   return " ".repeat(i * 4);
 }
@@ -31,9 +35,17 @@ function clearTestName(name: string): string {
   return "\u0008".repeat(name.length + 10);
 }
 
-function registerTest(
-  { name: testName, fn, ...opts }: Deno.TestDefinition,
+export function test(t: Deno.TestDefinition): void;
+export function test(name: string, fn: () => void | Promise<void>): void;
+export function test(
+  t: Deno.TestDefinition | string,
+  testFn?: () => void | Promise<void>,
 ): void {
+  // Extract args
+  const { name: testName, fn, ...opts } = typeof t === "object"
+    ? t
+    : (typeof testFn !== "undefined" ? { name: t, fn: testFn } : badArgs());
+
   // Set up waiting count.
   if (!opts.ignore) {
     globalContext.waitingTests++;
@@ -96,31 +108,6 @@ export function group(name: string, fn: () => void): void {
   });
   fn();
   globalContext.stack.pop();
-}
-
-export function test(name: string, fn: () => void | Promise<void>): void {
-  registerTest({
-    name,
-    fn,
-  });
-}
-
-export namespace test {
-  export function ignore(name: string, fn: () => void | Promise<void>): void {
-    registerTest({
-      name,
-      fn,
-      ignore: true,
-    });
-  }
-
-  // export function only(name: string, fn: () => void | Promise<void>): void {
-  //   registerTest({
-  //     name,
-  //     fn,
-  //     only: true,
-  //   });
-  // }
 }
 
 function getTopHooks(): Hooks {

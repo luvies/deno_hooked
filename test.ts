@@ -33,8 +33,12 @@ test("1", () => {
   log("1");
 });
 
-test.ignore("2", () => {
-  log("2");
+test({
+  name: "2",
+  fn() {
+    log("2");
+  },
+  ignore: true,
 });
 
 test("3", async () => {
@@ -63,8 +67,12 @@ group("group 1", () => {
     log("1");
   });
 
-  test.ignore("2", () => {
-    log("2");
+  test({
+    name: "2",
+    fn() {
+      log("2");
+    },
+    ignore: true,
   });
 
   test("3", async () => {
@@ -115,8 +123,12 @@ group("group 2", () => {
       log("1");
     });
 
-    test.ignore("2", () => {
-      log("2");
+    test({
+      name: "2",
+      fn() {
+        log("2");
+      },
+      ignore: true,
     });
 
     test("3", async () => {
