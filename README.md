@@ -1,6 +1,6 @@
 # Hooked - A tiny test module
 
-![CI](https://github.com/luvies/deno_hooked/workflows/CI/badge.svg)
+![CI](https://github.com/luvies/deno_hooked/workflows/CI/badge.svg) [![nest badge](https://nest.land/badge.svg)](https://nest.land/package/hooked)
 
 A simple expansion to Deno's standard test framework, providing before/after hooks to allow setting up and tearing down test data. This module also provides a simple method of grouping tests into logical blocks.
 

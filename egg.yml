@@ -1,0 +1,11 @@
+name: hooked
+description: A simple single file test module providing grouping and hooks.
+version: 0.1.0
+entry: ./mod.ts
+stable: false
+unlisted: false
+fmt: false
+repository: https://github.com/luvies/deno_hooked
+files:
+  - ./mod.ts
+  - ./README.md
