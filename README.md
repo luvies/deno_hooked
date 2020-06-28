@@ -128,6 +128,34 @@ group("Parent", () => {
 });
 ```
 
+Output:
+
+```
+Before all global
+Before each global
+> Global test
+After each global
+
+Before each global
+Before all parent
+Before each parent
+> Parent test
+After each parent
+After each global
+
+Before each global
+Before each parent
+Before all child
+Before each child
+> Child test
+After each child
+After all child
+After each parent
+After all parent
+After each global
+After all global
+```
+
 The global hooks (`before/after all/each global`) are called before/after every test defined. The hooks in the group `Parent` are called before/after all tests defined in the groups `Parent` and `Child`, however the global hooks take outer priority. This means the global before hooks are called before the hooks in the `Parent` group, and the global after hooks are called _after_ the hooks in the `Parent` group. The same applies between the `Parent` and `Child` groups, the parent hooks take outer priority.
 
 The ordering means that you can assume that any data that is set up by higher priority hooks is guaranteed to be set up before lower priority hooks are called.
