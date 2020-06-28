@@ -26,6 +26,10 @@ beforeAll(() => {
   log("before all global");
 });
 
+beforeAll(() => {
+  log("second before all global");
+});
+
 beforeEach(() => {
   log("before each global");
 });
